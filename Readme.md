@@ -1,7 +1,6 @@
 # Личный проект «Угадай мелодию» [![Build status][travis-image]][travis-url]
 
 * Студент: [Денис Богданов](https://up.htmlacademy.ru/ecmascript/6/user/111311).
-* Наставник: `Неизвестно`.
 
 ---
 
