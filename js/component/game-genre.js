@@ -101,6 +101,7 @@ uiSubmitButton.addEventListener(`click`, () => {
   uiAnswers.forEach((checkbox) => {
     checkbox.checked = false;
   });
+  uiSubmitButton.disabled = true;
   changeScreen(gameArtist);
 });
 
