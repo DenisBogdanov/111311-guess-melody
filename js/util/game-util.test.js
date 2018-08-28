@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {getScore} from './game-util';
+import {getScore, changeQtyOfLives} from './game-util';
 
 const MOCK_QUICK_ANSWERS = [];
 const MOCK_SLOW_ANSWERS = [];
@@ -62,4 +62,25 @@ describe(`getScore`, () => {
     assert.equal(getScore(MOCK_QUICK_ANSWERS, 0), 8);
   });
 
+});
+
+
+describe(`changeQtyOfLives`, () => {
+  it(`should allow only integers as the first argument`, () => {
+    assert.throws(() => changeQtyOfLives(true), `First argument (quantity of notes) should be an integer.`);
+    assert.throws(() => changeQtyOfLives({}), `First argument (quantity of notes) should be an integer.`);
+    assert.throws(() => changeQtyOfLives(null), `First argument (quantity of notes) should be an integer.`);
+    assert.throws(() => changeQtyOfLives(), `First argument (quantity of notes) should be an integer.`);
+  });
+
+  it(`should allow only non-negative values as the first argument`, () => {
+    assert.throws(() => changeQtyOfLives(-13), `First argument (quantity of notes) should be non-negative.`);
+  });
+
+  it(`should update quantity of notes`, () => {
+    assert.equal(changeQtyOfLives(0).notes, 0);
+    assert.equal(changeQtyOfLives(5).notes, 5);
+    assert.equal(changeQtyOfLives(42).notes, 42);
+    assert.equal(changeQtyOfLives(1001).notes, 1001);
+  });
 });

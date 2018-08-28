@@ -1,5 +1,3 @@
-const uiMain = document.querySelector(`section.main`);
-
 export const render = (template) => {
   const wrapper = document.createElement(`div`);
   wrapper.innerHTML = template.trim();
@@ -7,6 +5,7 @@ export const render = (template) => {
 };
 
 export const changeScreen = (element) => {
+  const uiMain = document.querySelector(`section.main`);
   uiMain.innerHTML = ``;
   uiMain.appendChild(element);
 };

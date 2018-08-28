@@ -2,11 +2,19 @@ const QTY_OF_QUESTIONS = 10;
 const INITIAL_QTY_OF_NOTES = 3;
 const QUICK_ANSWER = 30;
 
+const INITIAL_GAME = Object.freeze({
+  level: 0,
+  score: 0,
+  notes: 3,
+  time: 300
+});
+
 const points = {
   SLOW_ANSWER: 1,
   QUICK_ANSWER: 2,
   WRONG_ANSWER: 2
 };
+
 
 export const getScore = (answers, remainingNotes) => {
   if (!Array.isArray(answers)) {
@@ -40,4 +48,16 @@ export const getScore = (answers, remainingNotes) => {
   });
 
   return score;
+};
+
+
+export const changeQtyOfLives = (notes) => {
+  if (!Number.isInteger(notes)) {
+    throw new Error(`First argument (quantity of notes) should be an integer.`);
+  }
+  if (notes < 0) {
+    throw new Error(`First argument (quantity of notes) should be non-negative.`);
+  }
+
+  return Object.assign({}, INITIAL_GAME, {notes});
 };
