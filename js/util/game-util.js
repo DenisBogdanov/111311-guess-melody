@@ -73,3 +73,15 @@ export const changeLevel = (level) => {
 
   return Object.assign({}, INITIAL_GAME, {level});
 };
+
+
+export const changeTimer = (time) => {
+  if (!Number.isInteger(time)) {
+    throw new Error(`First argument (time) should be an integer.`);
+  }
+  if (time < 0) {
+    throw new Error(`First argument (time) should be non-negative.`);
+  }
+
+  return Object.assign({}, INITIAL_GAME, {time});
+};

@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {getScore, changeQtyOfLives, changeLevel} from './game-util';
+import {getScore, changeQtyOfLives, changeLevel, changeTimer} from './game-util';
 
 const MOCK_QUICK_ANSWERS = [];
 const MOCK_SLOW_ANSWERS = [];
@@ -103,5 +103,26 @@ describe(`change level`, () => {
     assert.equal(changeLevel(5).level, 5);
     assert.equal(changeLevel(42).level, 42);
     assert.equal(changeLevel(1001).level, 1001);
+  });
+});
+
+
+describe(`change time`, () => {
+  it(`should allow only integers as the first argument`, () => {
+    assert.throws(() => changeTimer(true), `First argument (time) should be an integer.`);
+    assert.throws(() => changeTimer(null), `First argument (time) should be an integer.`);
+    assert.throws(() => changeTimer({}), `First argument (time) should be an integer.`);
+    assert.throws(() => changeTimer(2.5), `First argument (time) should be an integer.`);
+  });
+
+  it(`should allow only non-negative values as the first argument`, () => {
+    assert.throws(() => changeTimer(-13), `First argument (time) should be non-negative.`);
+  });
+
+  it(`should update quantity of notes`, () => {
+    assert.equal(changeTimer(1).time, 1);
+    assert.equal(changeTimer(5).time, 5);
+    assert.equal(changeTimer(42).time, 42);
+    assert.equal(changeTimer(1001).time, 1001);
   });
 });
