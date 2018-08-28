@@ -1,5 +1,6 @@
 import {assert} from 'chai';
-import {getScore, changeQtyOfLives, changeLevel, changeTimer} from './game-util';
+import {getScore, changeQtyOfLives, changeLevel, changeTimer, showResult} from './game-util';
+import {messages} from './const';
 
 const MOCK_QUICK_ANSWERS = [];
 const MOCK_SLOW_ANSWERS = [];
@@ -10,6 +11,8 @@ for (let i = 0; i < 10; i++) {
   MOCK_SLOW_ANSWERS[i] = {correct: true, time: 31};
   MOCK_HALF_QUICK_ANSWERS[i] = i % 2 === 0 ? {correct: true, time: 29} : {correct: true, time: 31};
 }
+
+const MOCK_OTHER_PLAYERS_RESULTS = [4, 5, 8, 11];
 
 describe(`getScore`, () => {
 
@@ -62,6 +65,22 @@ describe(`getScore`, () => {
     assert.equal(getScore(MOCK_QUICK_ANSWERS, 0), 8);
   });
 
+});
+
+
+describe(`showResult()`, () => {
+
+  it(`should return correct message if there is no lives`, () => {
+    assert.equal(showResult(MOCK_OTHER_PLAYERS_RESULTS, {notes: -1, time: 10, score: 1}), messages.FAIL_LIVES_OVER);
+  });
+
+  it(`should return correct message if time is over`, () => {
+    assert.equal(showResult(MOCK_OTHER_PLAYERS_RESULTS, {notes: 2, time: 0, score: 1}), messages.FAIL_TIME_OVER);
+  });
+
+  it(`should return correct message when player is better than 60% of players`, () => {
+    assert.equal(showResult(MOCK_OTHER_PLAYERS_RESULTS, {notes: 2, time: 50, score: 10}), messages.success(2, 5, 60));
+  });
 });
 
 

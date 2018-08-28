@@ -1,19 +1,8 @@
+import {INITIAL_GAME, messages, points} from './const';
+
 const QTY_OF_QUESTIONS = 10;
 const INITIAL_QTY_OF_NOTES = 3;
 const QUICK_ANSWER = 30;
-
-const INITIAL_GAME = Object.freeze({
-  level: 0,
-  score: 0,
-  notes: 3,
-  time: 300
-});
-
-const points = {
-  SLOW_ANSWER: 1,
-  QUICK_ANSWER: 2,
-  WRONG_ANSWER: 2
-};
 
 
 export const getScore = (answers, remainingNotes) => {
@@ -48,6 +37,23 @@ export const getScore = (answers, remainingNotes) => {
   });
 
   return score;
+};
+
+
+export const showResult = (otherPlayersResults, currentPlayerResult) => {
+
+  if (currentPlayerResult.notes < 0) {
+    return messages.FAIL_LIVES_OVER;
+  }
+  if (currentPlayerResult.time <= 0) {
+    return messages.FAIL_TIME_OVER;
+  }
+
+  otherPlayersResults.push(currentPlayerResult.score);
+  otherPlayersResults.sort((a, b) => b - a);
+  const position = otherPlayersResults.indexOf(currentPlayerResult.score) + 1;
+  const percentile = Math.round((otherPlayersResults.length - position) / otherPlayersResults.length * 100);
+  return messages.success(position, otherPlayersResults.length, percentile);
 };
 
 
