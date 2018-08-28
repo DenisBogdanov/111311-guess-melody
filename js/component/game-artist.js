@@ -1,4 +1,4 @@
-import {render, changeScreen} from '../util';
+import {render, changeScreen} from '../util/screen-util';
 import welcome from './welcome';
 import success from './success';
 import failLivesOver from './fail-lives-over';

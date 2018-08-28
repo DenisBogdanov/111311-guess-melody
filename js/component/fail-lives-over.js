@@ -1,4 +1,4 @@
-import {render, changeScreen} from '../util';
+import {render, changeScreen} from '../util/screen-util';
 import welcome from './welcome';
 
 const template = `
