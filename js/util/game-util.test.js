@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {getScore, changeQtyOfLives} from './game-util';
+import {getScore, changeQtyOfLives, changeLevel} from './game-util';
 
 const MOCK_QUICK_ANSWERS = [];
 const MOCK_SLOW_ANSWERS = [];
@@ -78,9 +78,30 @@ describe(`changeQtyOfLives`, () => {
   });
 
   it(`should update quantity of notes`, () => {
-    assert.equal(changeQtyOfLives(0).notes, 0);
+    assert.equal(changeQtyOfLives(1).notes, 1);
     assert.equal(changeQtyOfLives(5).notes, 5);
     assert.equal(changeQtyOfLives(42).notes, 42);
     assert.equal(changeQtyOfLives(1001).notes, 1001);
+  });
+});
+
+
+describe(`change level`, () => {
+  it(`should allow only integers as the first argument`, () => {
+    assert.throws(() => changeLevel(true), `First argument (level) should be an integer.`);
+    assert.throws(() => changeLevel(null), `First argument (level) should be an integer.`);
+    assert.throws(() => changeLevel({}), `First argument (level) should be an integer.`);
+    assert.throws(() => changeLevel(2.5), `First argument (level) should be an integer.`);
+  });
+
+  it(`should allow only non-negative values as the first argument`, () => {
+    assert.throws(() => changeLevel(-13), `First argument (level) should be non-negative.`);
+  });
+
+  it(`should update quantity of notes`, () => {
+    assert.equal(changeLevel(1).level, 1);
+    assert.equal(changeLevel(5).level, 5);
+    assert.equal(changeLevel(42).level, 42);
+    assert.equal(changeLevel(1001).level, 1001);
   });
 });

@@ -61,3 +61,15 @@ export const changeQtyOfLives = (notes) => {
 
   return Object.assign({}, INITIAL_GAME, {notes});
 };
+
+
+export const changeLevel = (level) => {
+  if (!Number.isInteger(level)) {
+    throw new Error(`First argument (level) should be an integer.`);
+  }
+  if (level < 0) {
+    throw new Error(`First argument (level) should be non-negative.`);
+  }
+
+  return Object.assign({}, INITIAL_GAME, {level});
+};
