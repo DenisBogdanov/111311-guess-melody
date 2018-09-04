@@ -1,5 +1,5 @@
-import {render, changeScreen} from '../util/screen-util';
-import gameGenre from './game-genre';
+import {render} from '../util/screen-util';
+import play from "../controller";
 
 const template = `
   <section class="welcome">
@@ -18,6 +18,6 @@ const template = `
 const element = render(template);
 
 const uiPlayButton = element.querySelector(`.welcome__button`);
-uiPlayButton.addEventListener(`click`, () => changeScreen(gameGenre));
+uiPlayButton.addEventListener(`click`, () => play());
 
 export default element;

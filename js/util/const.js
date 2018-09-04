@@ -2,7 +2,8 @@ export const INITIAL_GAME = Object.freeze({
   level: 0,
   score: 0,
   notes: 3,
-  time: 300
+  time: 300,
+  answers: new Set()
 });
 
 export const messages = {

@@ -1,5 +1,5 @@
-import {render, changeScreen} from '../util/screen-util';
-import welcome from './welcome';
+import {render} from '../util/screen-util';
+import play from "../controller";
 
 const template = `
   <section class="result">
@@ -14,6 +14,6 @@ const template = `
 const element = render(template);
 
 const uiReplayButton = element.querySelector(`.result__replay`);
-uiReplayButton.addEventListener(`click`, () => changeScreen(welcome));
+uiReplayButton.addEventListener(`click`, () => play());
 
 export default element;
