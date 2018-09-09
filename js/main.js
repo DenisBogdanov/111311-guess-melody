@@ -1,4 +1,11 @@
 import {changeScreen} from './util/screen-util';
-import welcome from './component/welcome';
+import WelcomeView from './component/welcome-view';
+import play from './controller';
 
-changeScreen(welcome);
+const welcomeView = new WelcomeView();
+
+changeScreen(welcomeView.element);
+
+welcomeView.play = () => {
+  play();
+};

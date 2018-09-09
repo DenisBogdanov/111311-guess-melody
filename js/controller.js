@@ -1,187 +1,123 @@
 import {INITIAL_GAME} from './util/const';
-import {changeScreen, render} from './util/screen-util';
-import header from './component/game-header';
-import gameGenreTemplate from './component/game-genre';
-import gameArtistTemplate from './component/game-artist';
-import gameConfirm from './component/game-confirm';
-import welcome from './component/welcome';
-import livesOver from './component/fail-lives-over';
-import success from './component/success';
+import {changeScreen} from './util/screen-util';
+import SuccessView from './component/success-view';
 import getQuestions from "./data/tracks";
 import {getScore, showResult} from "./util/game-util";
+import WelcomeView from "./component/welcome-view";
+import NotesOverView from "./component/notes-over-view";
+import HeaderView from "./component/header-view";
+import ConfirmView from "./component/confirm-view";
+import GenreView from "./component/genre-view";
+import ArtistView from "./component/artist-view";
 
-let gameState;
+const QUESTIONS = getQuestions(5);
+
+let gameState = Object.assign({}, INITIAL_GAME);
 
 const resetGame = () => {
   gameState = Object.assign({}, INITIAL_GAME);
 };
 
-const play = () => {
-  gameState = Object.assign({}, INITIAL_GAME);
-  const questions = getQuestions(5);
+const welcomeView = new WelcomeView();
+welcomeView.play = () => {
+  play();
+};
 
-  let headerElement = render(header(gameState));
+const notesOverView = new NotesOverView();
+notesOverView.replay = () => {
+  play();
+};
 
-  const updateGame = (state, gameTypeElement) => {
-    headerElement = render(header(state));
-    gameTypeElement.replaceChild(headerElement, gameTypeElement.firstElementChild);
-    gameTypeElement.appendChild(gameConfirm);
+const confirmView = new ConfirmView();
+confirmView.onCancel = () => {
+  confirmView.element.classList.add(`modal--hidden`);
+};
+confirmView.onConfirm = () => {
+  confirmView.element.classList.add(`modal--hidden`);
+  resetGame();
+  changeScreen(welcomeView.element);
+};
+
+const updateGame = (state, gameType) => {
+  const headerView = new HeaderView(state);
+  headerView.restart = () => {
+    confirmView.element.classList.remove(`modal--hidden`);
   };
 
-  let gameGenre = render(gameGenreTemplate(questions[gameState.level]));
+  gameType.element.insertBefore(headerView.element, gameType.element.firstElementChild);
+  gameType.element.appendChild(confirmView.element);
+  changeScreen(gameType.element);
+};
 
-  gameGenre.insertBefore(headerElement, gameGenre.firstElementChild);
-  gameGenre.appendChild(gameConfirm);
-  changeScreen(gameGenre);
+const gameGenre = (question) => {
+  const genreView = new GenreView(question);
 
-  let gameArtist;
+  genreView.checkAnswer = (uiAnswers) => {
+    const userAnswers = uiAnswers.filter((checkbox) => checkbox.checked);
+    const isWrongAnswer = userAnswers.some((answer) => answer.value !== question.answer);
 
-  const startGameGenre = () => {
-    const uiReplayButton = gameGenre.querySelector(`.game__back`);
-    const uiSubmitButton = gameGenre.querySelector(`.game__submit`);
-    const uiForm = gameGenre.querySelector(`.game__tracks`);
-    const uiAnswers = [...uiForm.elements.answer];
-    const uiPlayButton = [...uiForm.querySelectorAll(`.track__button`)];
-    const uiAudioElements = [...uiForm.querySelectorAll(`audio`)];
-
-    uiReplayButton.addEventListener(`click`, (event) => {
-      event.preventDefault();
-      gameConfirm.classList.remove(`modal--hidden`);
-    });
-
-    gameConfirm.querySelector(`#ok`).addEventListener(`click`, (event) => {
-      event.preventDefault();
-      resetGame();
-      changeScreen(welcome);
-      gameConfirm.classList.add(`modal--hidden`);
-    });
-
-    uiPlayButton[0].classList.add(`track__button--pause`);
-    uiAudioElements[0].play();
-
-    uiPlayButton.forEach((btn, index) => {
-      btn.addEventListener(`click`, (event) => {
-        event.preventDefault();
-        if (btn.classList.contains(`track__button--pause`)) {
-          btn.classList.remove(`track__button--pause`);
-          uiAudioElements[index].pause();
-        } else {
-          for (let i = 0; i < uiPlayButton.length; i++) {
-            uiPlayButton[i].classList.remove(`track__button--pause`);
-            uiAudioElements[i].pause();
-          }
-          btn.classList.add(`track__button--pause`);
-          uiAudioElements[index].play();
-        }
-      });
-    });
-
-    uiAnswers.forEach((elem) => elem.addEventListener(`change`, () => {
-      uiSubmitButton.disabled = !uiAnswers.some((checkbox) => checkbox.checked);
-    }));
-
-    uiSubmitButton.addEventListener(`click`, (event) => {
-      event.preventDefault();
-      const userAnswers = uiAnswers.filter((checkbox) => checkbox.checked);
-      const isWrongAnswer = userAnswers.some((answer) => answer.value !== questions[gameState.level].answer);
-
-      if (isWrongAnswer) {
-        gameState.notes--;
-        if (gameState.notes === 0) {
-          changeScreen(livesOver);
-          return;
-        } else {
-          gameState.answers.add({correct: false, time: 31});
-          updateGame(gameState, gameGenre);
-          uiForm.reset();
-          uiSubmitButton.disabled = true;
-        }
+    if (isWrongAnswer) {
+      gameState.notes--;
+      if (gameState.notes === 0) {
+        changeScreen(notesOverView.element);
+        return;
       } else {
-        gameState.answers.add({result: true, time: 31});
+        gameState.answers.add({correct: false, time: 31});
+        updateGame(gameState, genreView);
       }
+    } else {
+      gameState.answers.add({correct: true, time: 31});
+    }
 
-      gameArtist = render(gameArtistTemplate(questions[++gameState.level], gameState));
-      gameArtist.insertBefore(headerElement, gameArtist.firstElementChild);
-      gameArtist.appendChild(gameConfirm);
-      changeScreen(gameArtist);
-      startGameArtist();
-      uiForm.reset();
-      uiSubmitButton.disabled = true;
-    });
+    updateGame(gameState, gameArtist(QUESTIONS[++gameState.level]));
   };
 
-  startGameGenre();
+  return genreView;
+};
 
-  const startGameArtist = () => {
-    const uiReplayButton = gameArtist.querySelector(`.game__back`);
-    const uiForm = gameArtist.querySelector(`.game__artist`);
-    const uiAnswers = [...uiForm.elements.answer];
-    const uiPlayButton = gameArtist.querySelector(`.track__button`);
-    const uiAudioElements = gameArtist.querySelector(`audio`);
+const gameArtist = (question) => {
+  const artistView = new ArtistView(question);
 
-    uiReplayButton.addEventListener(`click`, (event) => {
-      event.preventDefault();
-      gameConfirm.classList.remove(`modal--hidden`);
-    });
-
-    gameConfirm.querySelector(`#ok`).addEventListener(`click`, (event) => {
-      event.preventDefault();
-      resetGame();
-      changeScreen(welcome);
-      gameConfirm.classList.add(`modal--hidden`);
-    });
-
-    uiPlayButton.addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      uiPlayButton.classList.toggle(`track__button--pause`);
-      if (uiPlayButton.classList.contains(`track__button--pause`)) {
-        uiAudioElements.play();
+  artistView.checkAnswer = (answer) => {
+    if (answer.value !== QUESTIONS[gameState.level].answer.artist) {
+      gameState.notes--;
+      if (gameState.notes === 0) {
+        changeScreen(notesOverView.element);
+        return;
       } else {
-        uiAudioElements.pause();
+        gameState.answers.add({correct: false, time: 31});
+        updateGame(gameState, artistView);
       }
-    });
+    } else {
+      gameState.answers.add({correct: true, time: 31});
+    }
 
-    for (const answer of uiAnswers) {
-      answer.addEventListener(`click`, () => {
-        if (answer.value !== questions[gameState.level].question.name) {
-          gameState.notes--;
-          if (gameState.notes === 0) {
-            changeScreen(livesOver);
-            return;
-          } else {
-            gameState.answers.add({correct: false, time: 31});
-            updateGame(gameState, gameGenre);
-            uiForm.reset();
-          }
-        } else {
-          gameState.answers.add({result: true, time: 31});
-        }
+    if (QUESTIONS[++gameState.level]) {
+      updateGame(gameState, gameGenre(QUESTIONS[gameState.level]));
+    } else {
+      const result = {
+        score: getScore([...gameState.answers], gameState.notes),
+        notes: gameState.notes,
+        time: 100,
+      };
 
-        if (questions[++gameState.level]) {
-          gameGenre = render(gameGenreTemplate(questions[gameState.level], gameState));
-          gameGenre.insertBefore(headerElement, gameGenre.firstElementChild);
-          gameGenre.appendChild(gameConfirm);
-          changeScreen(gameGenre);
-          startGameGenre();
-        } else {
-          const resultUserGame = {
-            score: getScore([...gameState.answers], gameState.notes),
-            notes: gameState.notes,
-            time: 100,
-          };
-          const resultTemplate = render(success(resultUserGame.score, showResult([], resultUserGame), gameState));
-          resultTemplate.querySelector(`.result__replay`).addEventListener(`click`, (event) => {
-            event.preventDefault();
-            resetGame();
-            play();
-          });
+      const successView = new SuccessView(result.score, showResult([], result), gameState);
 
-          changeScreen(resultTemplate);
-        }
-        uiForm.reset();
-      });
+      successView.restart = () => {
+        resetGame();
+        play();
+      };
+
+      changeScreen(successView.element);
     }
   };
+
+  return artistView;
+};
+
+const play = () => {
+  resetGame();
+  updateGame(gameState, gameGenre(QUESTIONS[gameState.level]));
 };
 
 export default play;
